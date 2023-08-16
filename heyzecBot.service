@@ -1,0 +1,13 @@
+[Unit]
+Description=Combined bot that works for heyzec on Telegram
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/servers/heyzecBot
+ExecStart=python /home/pi/servers/heyzecBot/heyzecBot.py
+Restart=always
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
