@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/home/pi/servers/heyzecBot
-ExecStart=python /home/pi/servers/heyzecBot/heyzecBot.py
+ExecStart=python /home/pi/servers/heyzecBot/main.py
 Restart=always
 TimeoutStopSec=5
 
