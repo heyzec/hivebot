@@ -36,6 +36,17 @@
             (importhook ps)
 
             python-telegram-bot
+
+            pytest
+            (pytest-asyncio.overrideAttrs {
+              src = fetchFromGitHub {
+                owner = "pytest-dev";
+                repo = "pytest-asyncio";
+                rev = "refs/tags/v0.21.1";
+                hash = "sha256-Wpo8MpCPGiXrckT2x5/yBYtGlzso/L2urG7yGc7SPkA=";
+              };
+            })
+            telethon
           ];
         in python3.withPackages python-packages)
       ];

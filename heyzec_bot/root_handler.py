@@ -48,10 +48,10 @@ def get_root_handler(host):
             await update.message.reply_text("No such bot")
             return
 
-        final = []
-        for command, description in bot.commands:
-            final.append(BotCommand(command, description))
-        await context.application.bot.set_my_commands(final)
+        # final = []
+        # for command, description in bot.commands:
+        #     final.append(BotCommand(command, description))
+        # await context.application.bot.set_my_commands(final)
 
         await update.message.reply_text(f"Activated {bot_name} with {len(bot.handlers)} handlers.")
         return ConversationHandler.END

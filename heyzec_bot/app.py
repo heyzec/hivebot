@@ -57,8 +57,7 @@ def load_bots():
     print(f"Loaded {len(bots)} bots: {', '.join(messages)}")
     return bots
 
-
-def start(tenant_bots):
+def prep():
     TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')
     assert TELE_API_TOKEN is not None
 
@@ -68,9 +67,19 @@ def start(tenant_bots):
     builder = ApplicationBuilder().token(TELE_API_TOKEN).persistence(persistence)
     app = builder.build()
     host.app = app
-    host.bots = tenant_bots
+    host.bots = load_bots()
 
     conv_handler = get_root_handler(host)
     app.add_handler(conv_handler)
+    return app
+
+def start():
+    app = prep()
     app.run_polling()
+
+async def start_nonblocking(tenant_bots):
+    app = prep()
+    await app.initialize()
+    await app.updater.start_polling()
+    await app.start()
 

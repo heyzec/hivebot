@@ -23,7 +23,4 @@ TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')
 from heyzec_bot.app import start, load_bots
 
 if __name__ == "__main__":
-    apps = []
-    tenant_bots = load_bots()
-
-    start(tenant_bots)
+    start()
