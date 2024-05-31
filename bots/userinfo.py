@@ -1,12 +1,13 @@
+import os
 
 from telegram.ext import (
-        CommandHandler,
-        MessageHandler,
-        ConversationHandler,
-        filters,
+    ApplicationBuilder,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
 )
 
-from app import register
 
 STARTED = 1
 
@@ -45,6 +46,15 @@ conv_handler = ConversationHandler(
         fallbacks=[CommandHandler('cancel', cancel)],
 )
 
-@register('InfoBot')
-def main(app):
+from dotenv import load_dotenv
+
+load_dotenv()
+
+TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')
+
+def main():
+    app = ApplicationBuilder().token(TELE_API_TOKEN).build()
     app.add_handler(conv_handler)
+
+if __name__ == "__main__":
+    main()
