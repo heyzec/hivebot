@@ -1,2 +1,11 @@
+# Flakes
+.direnv
+
+# Cache
 __pycache__/
+
+# Secrets
 .env
+
+# Data
+persistence.pickle
