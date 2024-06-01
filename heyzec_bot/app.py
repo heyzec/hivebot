@@ -1,5 +1,7 @@
 from __future__ import annotations
 import os
+import sys
+
 from dotenv import load_dotenv
 import importhook
 import importlib
@@ -43,6 +45,8 @@ def load_bots():
             module_name = f"bots.{path}"
         else:
             continue
+
+        sys.path.append(f"bots/{path}")
         bot_module = importlib.import_module(module_name)
         bot_module.main()
         handlers = mock_application_builder.get_handlers()
