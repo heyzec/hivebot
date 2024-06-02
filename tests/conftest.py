@@ -1,5 +1,4 @@
 import asyncio
-import multiprocessing
 import os
 
 from dotenv import load_dotenv
@@ -8,38 +7,10 @@ import pytest_asyncio
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
-from heyzec_bot.app import prep
 
-
-async def run(app, stop_event):
-    await app.initialize()
-    await app.updater.start_polling()
-    await app.start()
-    while True:
-        if not stop_event.is_set():
-            await asyncio.sleep(1)
-        else:
-            break
-    await app.updater.stop()
-    await app.stop()
-    await app.shutdown()
-
-def runner(app, stop_event):
-    asyncio.run(run(app, stop_event))
-
-
-@pytest.fixture(autouse=True, scope="session")
-def bot():
+@pytest.fixture(scope='session')
+def setup():
     load_dotenv()
-    stop_event = multiprocessing.Event()
-    app = prep()
-
-    p = multiprocessing.Process(target=runner, args=(app, stop_event))
-    p.start()
-    yield
-    stop_event.set()
-    p.join()
-
 
 # All parts of Telethon must run in the same event loop!
 # Since we are using fixtures, we must force each test to also run in the session event loop

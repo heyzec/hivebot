@@ -1,8 +1,15 @@
 import pytest
 
+from tests.helpers.bot_fixtures import bot_fixture
+
+
 UWUIFY = 'uwuify'
 USERINFO = 'userinfo'
 
+@pytest.fixture(autouse=True, scope='module')
+def bot_fixture_():
+    with bot_fixture() as result:
+        yield result
 
 @pytest.mark.asyncio
 async def test_message_when_inactive(conv):
