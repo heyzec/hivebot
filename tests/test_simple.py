@@ -1,7 +1,7 @@
 import pytest
 
-UWUIFY = 'bots.uwuify'
-USERINFO = 'bots.userinfo'
+UWUIFY = 'uwuify'
+USERINFO = 'userinfo'
 
 
 @pytest.mark.asyncio

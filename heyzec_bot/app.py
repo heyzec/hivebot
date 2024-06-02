@@ -20,6 +20,9 @@ from heyzec_bot.root_handler import get_root_handler
 TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')
 ADMIN_CHAT_ID = os.environ.get('ADMIN_CHAT_ID')
 
+# Folder to look for tenant bots
+BOTS_FOLDER = "bots"
+
 def load_bots():
     """Load all tenant bots in the specified folder."""
     mock_application_builder = MockApplicationBuilder()
@@ -32,26 +35,54 @@ def load_bots():
         return new_module
 
     bots = []
-    for entry in os.scandir('bots'):
+    for entry in os.scandir(BOTS_FOLDER):
         path = entry.name
         if entry.is_file():
-            if path == '__init__.py' or path[-3:] != '.py':
+            if path == '__init__.py' or not path.endswith('.py'):
                 continue
-            module_name = f"bots.{path[:-3]}"
+
+            # Treat the single file as a part of the BOTS_FOLDER module
+            basename = os.path.splitext(path)[0]
+            module_name = f"{BOTS_FOLDER}.{basename}"
+            bot_name = basename
         elif entry.is_dir():
             if path == '__pycache__':
                 continue
-            load_dotenv(f"bots/{path}/.env")
-            module_name = f"bots.{path}"
+
+            if not os.path.exists(os.path.join(BOTS_FOLDER, path, 'main.py')):
+                print(f"{BOTS_FOLDER}/{path} does not contain main.py, skipping...")
+                continue
+
+            # Pretend to run the main.py from within the folder
+            module_name = "main"
+            sys.path.insert(0, os.path.join(BOTS_FOLDER, path))
+            load_dotenv(os.path.join(BOTS_FOLDER, path, '.env'))
+            bot_name = f"{path}"
         else:
             continue
 
-        sys.path.append(f"bots/{path}")
-        bot_module = importlib.import_module(module_name)
-        bot_module.main()
+
+        try:
+            bot_module = importlib.import_module(module_name)
+        except Exception as e:
+            print(f"An error occurred while importing {bot_name}, skipping: {e}")
+            continue
+
+        try:
+            entrypoint = bot_module.main
+        except AttributeError:
+            relpath = os.path.relpath(bot_module.__file__, os.getcwd())
+            print(f"{relpath} has no main function, skipping")
+            continue
+
+        try:
+            entrypoint()
+        except Exception as e:
+            print(f"An error occurred while starting up {bot_name}, skipping: {e}")
+            continue
         handlers = mock_application_builder.get_handlers()
 
-        bot = TenantBot(module_name, handlers)
+        bot = TenantBot(bot_name, handlers)
         bots.append(bot)
 
 
