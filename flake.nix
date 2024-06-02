@@ -1,54 +1,40 @@
 {
-  description = "Template for a direnv shell, with Python";
+  description = "Template for a direnv shell, with Python + Poetry";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    poetry2nix.url = "github:nix-community/poetry2nix";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, poetry2nix }:
   let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication defaultPoetryOverrides;
 
-    importhook = ps: let
-      pname = "importhook";
-      version = "1.0.9";
-    in ps.buildPythonPackage {
-      inherit pname version;
-
-      src = pkgs.fetchFromGitHub {
-        owner = "rkargon";
-        repo = "importhook";
-        rev = "5c8df7a9c5060eb66f32f2c44bb60ba0aaf65d2f";
-        sha256 = "sha256-WyScHcAOEO0ASEF8IWHoPSPZGnCPq8b+eGSNtV/WNSY=";
-      };
-      doCheck = false;
+    pypkgs-build-requirements = {
+      importhook = [ "setuptools" ];
     };
+    p2n-overrides = defaultPoetryOverrides.extend (final: prev:
+      builtins.mapAttrs (package: build-requirements:
+        (builtins.getAttr package prev).overridePythonAttrs (old: {
+          buildInputs = (old.buildInputs or [ ]) ++ (builtins.map (pkg: if builtins.isString pkg then builtins.getAttr pkg prev else pkg) build-requirements);
+        })
+      ) pypkgs-build-requirements
+    );
 
+
+    myPythonApp = mkPoetryApplication {
+      preferWheels = true;
+      projectDir = ./.;
+      overrides = p2n-overrides;
+    };
   in
   {
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [
-        (let
-          python-packages = ps: with ps; [
-            python-dotenv
-
-            (importhook ps)
-
-            python-telegram-bot
-
-            pytest
-            (pytest-asyncio.overrideAttrs {
-              src = fetchFromGitHub {
-                owner = "pytest-dev";
-                repo = "pytest-asyncio";
-                rev = "refs/tags/v0.21.1";
-                hash = "sha256-Wpo8MpCPGiXrckT2x5/yBYtGlzso/L2urG7yGc7SPkA=";
-              };
-            })
-            telethon
-          ];
-        in python3.withPackages python-packages)
+        poetry
+        myPythonApp
       ];
     };
   };

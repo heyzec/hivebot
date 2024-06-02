@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "heyzec_bot"
+version = "0.1.0"
+description = ""
+authors = ["heyzec <61238538+heyzec@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+gmymaps = "^0.1.1"
+pandas = "^2.2.1"
+python-telegram-bot = "^21.2"
+openai = "^1.30.5"
+gspread = "^6.1.2"
+oauth2client = "^4.1.3"
+python-dotenv = "^1.0.1"
+lxml = "^5.2.2"
+googlemaps = "^4.10.0"
+languagemodels = "^0.20.0"
+# Use patched version, see https://github.com/brettlangdon/importhook/pull/7
+importhook = {git = "https://github.com/rkargon/importhook.git", rev = "fix-namespace-modules"}
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+pytest-asyncio = "^0.21.1"
+telethon = "^1.35.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
