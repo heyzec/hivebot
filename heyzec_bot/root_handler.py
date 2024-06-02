@@ -10,6 +10,7 @@ from telegram.ext import (
         filters,
 )
 
+from heyzec_bot.host_bot import HostBot
 
 
 SWITCHING = 1
@@ -24,8 +25,7 @@ class AnyHandler(BaseHandler[Update, CallbackContext]):
         return ConversationHandler.END
 
 
-def get_root_handler(host):
-
+def get_root_handler(host: HostBot):
     async def switch(update, context):
         chat_id = update.message.chat.id
         try:
@@ -42,7 +42,7 @@ def get_root_handler(host):
             return SWITCHING
 
 
-        bot = host.switch_to_bot(chat_id, bot_name)
+        bot = host.set_active_bot(chat_id, bot_name)
 
         if bot is None:
             await update.message.reply_text("No such bot")
@@ -59,7 +59,7 @@ def get_root_handler(host):
     async def select_bot(update, context):
         chat_id = update.message.chat.id
         bot_name = update.message.text
-        bot = host.switch_to_bot(chat_id, bot_name)
+        bot = host.set_active_bot(chat_id, bot_name)
         if bot is None:
             text = f"Bot {bot_name} does not exist!"
         else:
@@ -71,6 +71,7 @@ def get_root_handler(host):
 
 
     handler = ConversationHandler(
+        name='root_handler',
         entry_points=[
             CommandHandler("switch", switch),
             MessageHandler(filters.ALL, host.handle_update),
@@ -82,6 +83,7 @@ def get_root_handler(host):
             ],
         },
         fallbacks=[],
+        persistent=True,
     )
     return handler
 

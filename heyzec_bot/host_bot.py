@@ -2,24 +2,45 @@ from typing import Optional
 from telegram import Update
 
 from telegram.ext import Application, CallbackContext
+
 from .tenant_bot import TenantBot
 
 class HostBot:
-    app: Application
-    bots: list[TenantBot]
-    active_bot: Optional[TenantBot] = None
-    base_handlers: list[object]
+    def __init__(self, app: Application):
+        self.app = app
+        self.bots: list[TenantBot]
+        self.active_bots: dict[int, list[str]] = {}
 
-    active_bots: dict[int, set[TenantBot]]
+        async def post_init(app):
+            self.active_bots = app.bot_data.get('active_bots', {})
+            app.bot_data['active_bots'] = self.active_bots
 
-    def __init__(self) -> None:
-        self.active_bots = {}
+        app.post_init = post_init
 
-
-    def get_active_bots(self, chat_id):
+    def get_active_bots(self, chat_id: int):
         if chat_id not in self.active_bots:
             return []
-        return self.active_bots[chat_id]
+
+        bot_names = self.active_bots[chat_id]
+        bots = []
+        for bot_name in bot_names:
+            for bot in self.bots:
+                if bot.name == bot_name:
+                    bots.append(bot)
+                    break
+        return bots
+
+    def set_active_bot(self, chat_id: int, bot_name: str) -> Optional[TenantBot]:
+        if bot_name not in (bot.name for bot in self.bots):
+            return None
+
+        self.active_bots[chat_id] = [bot_name]
+
+        for bot in self.bots:
+            if bot.name == bot_name:
+                return bot
+        assert False
+
 
     async def handle_update(self, update: Update, context: CallbackContext):
         chat_id = update.effective_chat.id
@@ -47,14 +68,4 @@ class HostBot:
 
 
 
-
-    def switch_to_bot(self, chat_id, bot_name):
-        if bot_name not in (bot.name for bot in self.bots):
-            return None
-
-        # Activate new bot
-        bot = list(filter(lambda bot: bot.name == bot_name, self.bots))[0]
-
-        self.active_bots[chat_id] = [bot]
-        return bot
 
