@@ -96,12 +96,11 @@ def prep():
     TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')
     assert TELE_API_TOKEN is not None
 
-    host = HostBot()
 
     persistence = PicklePersistence(filepath="persistence.pickle")
     builder = ApplicationBuilder().token(TELE_API_TOKEN).persistence(persistence)
     app = builder.build()
-    host.app = app
+    host = HostBot(app)
     host.bots = load_bots()
 
     conv_handler = get_root_handler(host)
