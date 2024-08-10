@@ -11,10 +11,10 @@ from telegram.ext import (
         PicklePersistence,
 )
 
-from heyzec_bot.tenant_bot import TenantBot
-from heyzec_bot.host_bot import HostBot
-from heyzec_bot.mocks import MockApplicationBuilder
-from heyzec_bot.root_handler import get_root_handler
+from hivebot.tenant_bot import TenantBot
+from hivebot.host_bot import HostBot
+from hivebot.mocks import MockApplicationBuilder
+from hivebot.root_handler import get_root_handler
 
 
 TELE_API_TOKEN = os.environ.get('TELE_API_TOKEN')

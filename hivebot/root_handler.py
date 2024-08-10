@@ -10,7 +10,7 @@ from telegram.ext import (
         filters,
 )
 
-from heyzec_bot.host_bot import HostBot
+from hivebot.host_bot import HostBot
 
 
 SWITCHING = 1

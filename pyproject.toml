@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "heyzec_bot"
+name = "hivebot"
 version = "0.1.0"
 description = ""
 authors = ["heyzec <61238538+heyzec@users.noreply.github.com>"]

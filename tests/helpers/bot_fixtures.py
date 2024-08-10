@@ -4,7 +4,7 @@ import multiprocessing
 
 from telegram.ext import Application
 
-from heyzec_bot.app import prep
+from hivebot.app import prep
 
 
 async def run(app: Application, stop_event):
