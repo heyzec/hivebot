@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "hivebot"
 version = "0.1.0"
-description = ""
+description = "Host multiple PTB Telegram bots within a same bot account"
 authors = ["heyzec <61238538+heyzec@users.noreply.github.com>"]
 readme = "README.md"
 
